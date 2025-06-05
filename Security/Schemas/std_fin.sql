@@ -1,0 +1,2 @@
+﻿CREATE SCHEMA [std_fin]
+GO

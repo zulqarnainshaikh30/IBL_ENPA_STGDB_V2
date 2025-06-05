@@ -1,0 +1,32 @@
+﻿CREATE TABLE [dbo].[SYNERGY_CUSTOMER_STG] (
+  [DateOfData] [date] NULL,
+  [SourceSystem] [varchar](30) NULL,
+  [UCIC_ID] [varchar](30) NULL,
+  [CustomerID] [varchar](30) NULL,
+  [CustomerName] [varchar](100) NULL,
+  [Constitution] [varchar](100) NULL,
+  [Gender] [varchar](20) NULL,
+  [SegmentCode] [varchar](30) NULL,
+  [PANNO] [varchar](12) NULL,
+  [AlwaysNPA] [tinyint] NULL,
+  [AADHAAR] [varchar](12) NULL,
+  [Driving_License] [varchar](20) NULL,
+  [Voter_ID_Card_No] [varchar](30) NULL,
+  [CKYC_Number] [varchar](30) NULL,
+  [MNREGA] [varchar](30) NULL,
+  [DOB_DOI_Organization] [varchar](15) NULL,
+  [Email_Id] [varchar](50) NULL,
+  [GST] [varchar](30) NULL,
+  [Mobile_number] [varchar](15) NULL,
+  [CIN_Number] [varchar](30) NULL,
+  [Passport] [varchar](15) NULL,
+  [Communication_Address] [varchar](300) NULL,
+  [Pincode] [varchar](6) NULL,
+  [City] [varchar](50) NULL,
+  [UID_Token] [varchar](15) NULL,
+  [Is_Main_Borrower] [char](1) NULL,
+  [OriginationDate] [date] NULL,
+  [Application_No] [varchar](20) NULL
+)
+ON [PRIMARY]
+GO

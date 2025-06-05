@@ -1,0 +1,75 @@
+﻿SET QUOTED_IDENTIFIER, ANSI_NULLS ON
+GO
+CREATE PROCEDURE [dbo].[INSERT_CUSTOMER_ALL_SOURCE_SYSTEM]
+AS
+BEGIN
+
+SET DATEFORMAT DMY  
+SET DATEFORMAT DMY
+
+--TRUNCATE TABLE IBL_ENPA_STGDB_V2.[dbo].[CUSTOMER_ALL_SOURCE_SYSTEM]  
+
+DECLARE @TimeKey INT = (SELECT TIMEKEY FROM IBL_ENPA_DB_V2.DBO.SYSDATAMATRIX WHERE CurrentStatus='C')
+DECLARE @Exec_Date DATE = (SELECT DATE FROM IBL_ENPA_DB_V2.DBO.SYSDATAMATRIX WHERE TimeKey=@TimeKey)
+
+
+
+/*INSERTING DATA IN ACCOUNT_ALL_SOURCE_SYSTEM FOR INCREMENTAL DATA*/
+INSERT INTO CUSTOMER_ALL_SOURCE_SYSTEM (
+									DateOfData
+									,SourceSystem
+									,UCIC_ID
+									,CustomerID
+									,CustomerName
+									--,SegmentCode
+									,PANNO
+									,AssetClass
+									,NPADate
+									--,CustomerAcID
+									/*Constitution
+									Gender
+									PrevQtrRV
+									CurrQtrRV
+									DBT_LOS_Date
+									AlwaysNPA
+									*/
+									)
+							SELECT B.AsOnDate
+									,B.SourceName
+									,B.UCIF_ID
+									,B.RefCustomerID
+									,B.CustName
+									--,NULL ActSegmentCode
+									,B.PAN
+									,MAX(B.SrcAssetClass)
+									,MIN(B.SrcNpaDt)
+									--,B.CustomerAcID
+							FROM CUSTAC_MERGE_INCREMENTAL B 
+								LEFT JOIN CUSTOMER_ALL_SOURCE_SYSTEM C
+									ON C.CustomerID=B.RefCustomerID
+							WHERE C.CustomerID IS NULL
+			GROUP BY B.AsOnDate,B.SourceName,B.UCIF_ID,B.RefCustomerID,B.CustName,B.PAN
+
+/*UPDATING DATA IN SECURITY FOR CHANGED CUSTOMER ID FROM DAILY */
+
+UPDATE A SET A.CustomerId=B.RefCustomerID
+FROM IBL_ENPA_STGDB_V2.DBO.CUSTOMER_ALL_SOURCE_SYSTEM A
+INNER JOIN IBL_ENPA_STGDB_V2.dbo.CUSTAC_MERGE_INCREMENTAL B ON 
+												 A.UCIC_ID=B.UCIF_ID
+WHERE ISNULL(B.SRC_CIF_UPDATED,'N')='Y'
+--AND SrcSysAlt_Key=@SrcSysAlt_Key
+
+
+/*UPDATING DATA IN ACCOUNT_ALL_SOURCE_SYSTEM FOR CHANGED UCIC ID FROM DAILY*/
+
+UPDATE A SET A.UCIC_ID=B.UCIF_ID
+FROM IBL_ENPA_STGDB_V2.DBO.CUSTOMER_ALL_SOURCE_SYSTEM A
+INNER JOIN IBL_ENPA_STGDB_V2.dbo.CUSTAC_MERGE_DAILY B ON 
+												A.CustomerID=B.RefCustomerID
+												--AND A.CustomerACID=B.CustomerAcID
+WHERE ISNULL(A.UCIC_ID,'')<>ISNULL(B.UCIF_ID,'')
+
+
+
+END
+GO

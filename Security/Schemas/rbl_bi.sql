@@ -1,0 +1,2 @@
+﻿CREATE SCHEMA [rbl_bi]
+GO

@@ -1,0 +1,2 @@
+﻿CREATE SCHEMA [cc_cdr]
+GO

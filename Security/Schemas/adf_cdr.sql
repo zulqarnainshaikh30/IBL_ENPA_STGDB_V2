@@ -1,0 +1,2 @@
+﻿CREATE SCHEMA [adf_cdr]
+GO

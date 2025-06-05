@@ -1,0 +1,52 @@
+﻿SET QUOTED_IDENTIFIER, ANSI_NULLS ON
+GO
+CREATE PROCEDURE [dbo].[INSERT_SECURITY_ALL_SOURCE_SYSTEM]
+AS
+BEGIN
+SET DATEFORMAT DMY
+DECLARE @TimeKey INT = 25671
+DECLARE @EXT_DT date = (SELECT DATE FROM IBL_ENPA_DB_V2..SYSDATAMATRIX WHERE TIMEKEY=@TimeKey)
+DECLARE @Exec_Date DATE=(SELECT DATE FROM IBL_ENPA_DB_V2..SysDataMatrix WHERE CurrentStatus='C' )
+DECLARE @MaxSecID int=ISNULL((SELECT MAX(SecurityEntityID) FROM IBL_ENPA_DB.[CURDAT].AdvSecurityDetail),0) 
+DECLARE @SECURITY int=(SELECT isnull(COUNT(1),0) FROM IBL_ENPA_DB_V2.CURDAT.AdvSecurityValueDetail)
+DECLARE @MonthEndDate DATE=(SELECT EOMONTH(DATEADD(MONTH,-1,@Exec_Date)))
+
+
+SET DATEFORMAT DMY
+
+/*LOADING DATA FROM STAGE TABLE "MERGE_SECURITY" TO "IBL_ENPA_STGDB_V2.[DBO].SECURITY_ALL_SOURCE_SYSTEM"*/
+
+insert into [dbo].Security_All_Source_System
+(	
+			DateofData
+			,SourceSystem
+			,CollateralID
+			,CustomerID
+			,SRC_CIF
+			,Collateral_Type
+			,ValuationExpiryDate
+			,SecurityValue
+			,AccountID
+			,Valuationdate
+			,COLL_DELINK_DATE
+)   
+-------------LMS---------  
+SELECT AS_ON_DATE
+		,SOURCE
+		,COLL_ID
+		,ENT_CIF
+		,SRC_CIF
+		,COLL_TYPE
+		,COLL_EXPRY_DATE
+		,COLL_AMT
+		,ACC_NO
+		,COLL_VAL_DATE
+		,COLL_DELINK_DATE
+FROM   IBL_ENPA_STGDB_V2.[dbo].MERGE_SECURITY
+
+
+ END
+
+ 
+
+GO
